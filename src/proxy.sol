@@ -36,7 +36,6 @@ contract VaultProxy is ProxyData {
     constructor(address _authAddr) public {
         require(_authAddr != address(0), "proxy-auth-address-required");
         proxyAuth = ProxyAuth(_authAddr); 
-        return true;
     }
 
     function() external payable {
@@ -76,7 +75,7 @@ contract VaultProxy is ProxyData {
 // This factory deploys new proxy instances through build()
 // Deployed proxy addresses are logged
 contract VaultProxyFactory {
-    event Created(address indexed sender, address indexed owner, address proxy, address cache);
+    event Created(address indexed sender, address indexed owner, address proxy);
     mapping(address=>bool) public isProxy;
     ProxyAuth public proxyAuth;
 
@@ -95,7 +94,7 @@ contract VaultProxyFactory {
     // sets custom owner of proxy
     function build(address owner) public returns (address payable proxy) {
         proxy = address(new VaultProxy(address(proxyAuth)));
-        emit Created(msg.sender, owner, address(proxy), address(proxyAuth));
+        emit Created(msg.sender, owner, address(proxy));
         VaultProxy(proxy).setOwner(owner);
         isProxy[proxy] = true;
     }
