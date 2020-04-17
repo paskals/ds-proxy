@@ -76,7 +76,7 @@ contract VaultProxy is ProxyData {
 // Deployed proxy addresses are logged
 contract VaultProxyFactory {
     event Created(address indexed sender, address indexed owner, address proxy);
-    mapping(address=>bool) public isProxy;
+    mapping(address => address) public proxies;
     ProxyAuth public proxyAuth;
 
     constructor() public {
@@ -93,10 +93,11 @@ contract VaultProxyFactory {
     // deploys a new proxy instance
     // sets custom owner of proxy
     function build(address owner) public returns (address payable proxy) {
+        require(proxies[owner] == address(0), "Owner already has a proxy");
         proxy = address(new VaultProxy(address(proxyAuth)));
         emit Created(msg.sender, owner, address(proxy));
         VaultProxy(proxy).setOwner(owner);
-        isProxy[proxy] = true;
+        proxies[owner] = proxy;
     }
 }
 
